@@ -119,7 +119,7 @@ public class QueryHandler {
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
              responseBuilder.viewMessagesResponse(isAdmin, currentJar);
-        }else{
+        }else{  // If does not exists, passes null jar and result is outputted to user in RB
             responseBuilder.viewMessagesResponse(isAdmin, null);
         }
     }
