@@ -85,9 +85,7 @@ public class QueryHandler {
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             currentJar.addMessage(new Message(event.getMessageAuthor().getIdAsString(), message));  // add incoming
-
             if(checkMessageLimit()){
-
             }
         }else{
             LOGGER.info("""
