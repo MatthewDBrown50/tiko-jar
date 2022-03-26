@@ -63,21 +63,21 @@ public class QueryHandler {
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
                 () -> LOGGER.warn("Error retrieving Server ID from Javacord API"));
         LOGGER.trace("""
-            Initializing QueryHandler for
-            %s : %s
-            """.formatted(serverName, serverId));
+                Initializing QueryHandler for
+                %s : %s
+                """.formatted(serverName, serverId));
     }
 
     public void addMessage(String message) {
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
-                Jar Exists for Server: %s : %s
-                """.formatted(serverName, serverId));
+                    Jar Exists for Server: %s : %s
+                    """.formatted(serverName, serverId));
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getIdAsString(), message)))
             LOGGER.info("""
-                Checking if Message Added: %s : %s
-                """.formatted(serverName, serverId));
+                    Checking if Message Added: %s : %s
+                    """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             currentJar.addMessage(new Message(event.getMessageAuthor().getIdAsString(), message));  // add incoming
@@ -114,7 +114,7 @@ public class QueryHandler {
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
             responseBuilder.viewMessagesResponse(isAdmin, currentJar);
-        }else{  // If does not exists, passes null jar and result is outputted to user in RB
+        }else{  // If it does not exist, passes null jar and result is outputted to user in RB
             responseBuilder.viewMessagesResponse(isAdmin, null);
         }
     }
@@ -175,16 +175,16 @@ public class QueryHandler {
             responseCode = response.code();  // Stores response code as an int
             response.close();  // Close the client
             LOGGER.debug("""
-            ----HTTP Request Results----:
-                ::  Sent Query ::
-            %s
-                ::     URL     ::
-            %s
-                ::  Response   ::
-            Status Code: %d
-            Response Body:
-            %s
-            """.formatted(query,url,responseCode,postResponseBody));
+                    ----HTTP Request Results----:
+                        ::  Sent Query ::
+                    %s
+                        ::     URL     ::
+                    %s
+                        ::  Response   ::
+                    Status Code: %d
+                    Response Body:
+                    %s
+                    """.formatted(query,url,responseCode,postResponseBody));
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
         }
