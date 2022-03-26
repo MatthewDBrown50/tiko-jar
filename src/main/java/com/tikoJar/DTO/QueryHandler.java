@@ -175,16 +175,16 @@ public class QueryHandler {
             responseCode = response.code();  // Stores response code as an int
             response.close();  // Close the client
             LOGGER.debug("""
-        ----HTTP Request Results----:
-            ::  Sent Query ::
-        %s
-            ::     URL     ::
-        %s
-            ::  Response   ::
-        Status Code: %d
-        Response Body:
-        %s
-        """.formatted(query,url,responseCode,postResponseBody));
+            ----HTTP Request Results----:
+                ::  Sent Query ::
+            %s
+                ::     URL     ::
+            %s
+                ::  Response   ::
+            Status Code: %d
+            Response Body:
+            %s
+            """.formatted(query,url,responseCode,postResponseBody));
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
         }
