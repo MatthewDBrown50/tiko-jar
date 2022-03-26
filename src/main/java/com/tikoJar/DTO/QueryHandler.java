@@ -5,7 +5,6 @@ Nathan Wolf - QueryHandler Constructors, addMessage, viewMessage, checkMessageLi
     - checkIfJarExists, checkIfMessageAdded, pullJar, processQuery, stripJar, createJarQuery
 Joel Santos - createJar, checkTimeLimits, deleteMessage, deleteJar
 Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
-
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -55,17 +54,14 @@ public class QueryHandler {
         this.event = event;
         this.api = api;
         this.responseBuilder = new ResponseBuilder(event, api);
-
         event.getMessageAuthor().getDisplayName();
         // Anytime query handler called, since it is within the context of
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
                 () -> LOGGER.warn("Error retrieving Server name"));
-
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
                 () -> LOGGER.warn("Error retrieving Server ID from Javacord API"));
-
         LOGGER.trace("""
                 Initializing QueryHandler for
                 %s : %s
@@ -79,9 +75,9 @@ public class QueryHandler {
                     """.formatted(serverName, serverId));
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getIdAsString(), message)))
-                LOGGER.info("""
-                    Checking if Message Added: %s : %s
-                    """.formatted(serverName, serverId));
+            LOGGER.info("""
+                Checking if Message Added: %s : %s
+                """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             currentJar.addMessage(new Message(event.getMessageAuthor().getIdAsString(), message));  // add incoming
@@ -94,7 +90,6 @@ public class QueryHandler {
                     """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
-
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
@@ -162,7 +157,6 @@ public class QueryHandler {
     }
 
     public void processQuery(String query, String endPoint) {
-
         try {
             client = new OkHttpClient().newBuilder().build();
             mediaType = MediaType.parse("application/json");
@@ -179,7 +173,6 @@ public class QueryHandler {
             response = client.newCall(request).execute();  // execute the request
             postResponseBody = Objects.requireNonNull(response.body()).string(); // stores response body as a String
             responseCode = response.code();  // Stores response code as an int
-
             response.close();  // Close the client
             LOGGER.debug("""
         ----HTTP Request Results----:
@@ -204,7 +197,6 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
         return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
     }
@@ -244,13 +236,11 @@ public class QueryHandler {
 
     public void createJarQuery(Jar jar) {
         String createJarQuery = """
-                {
-                    "collection":"Jars",
-                    "database":"TikoJarTest",
-                    "dataSource":"PositivityJar",
-                    "filter": { "serverID": "%s" },
-                    "document": %s
-                }
+                {"collection":"Jars",
+                 "database":"TikoJarTest",
+                 "dataSource":"PositivityJar",
+                 "filter": { "serverID": "%s" },
+                 "document": %s }
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(jar).stripIndent());
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
