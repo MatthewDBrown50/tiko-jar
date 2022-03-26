@@ -54,6 +54,10 @@ public class Jar {
         this.messages = person;
     }
 
+    public void addMessage(Message message){
+        messages.add(message);
+    }
+
     public String getHashCode() { return hashCode;}
 
     public void setHashCode(String hashCode) { this.hashCode = hashCode;}

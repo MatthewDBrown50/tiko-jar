@@ -16,6 +16,7 @@ import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +26,7 @@ import java.util.Objects;
 public class QueryHandler {
 
     public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
-
+    DiscordApi api;
     private final MessageCreateEvent event;
 
     private Long serverId;  // serverID are Long data types
@@ -50,9 +51,12 @@ public class QueryHandler {
 
     Jar currentJar;  // is deserialized to if function is called ot do so
 
-    public QueryHandler(MessageCreateEvent event) {
+    public QueryHandler(MessageCreateEvent event, DiscordApi api) {
         this.event = event;
+        this.api = api;
+        this.responseBuilder = new ResponseBuilder(event, api);
 
+        event.getMessageAuthor().getDisplayName();
         // Anytime query handler called, since it is within the context of
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
@@ -69,7 +73,6 @@ public class QueryHandler {
     }
 
     public void addMessage(String message) {
-        responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
                     Jar Exists for Server: %s : %s
@@ -81,10 +84,10 @@ public class QueryHandler {
                     """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
+            currentJar.addMessage(new Message(event.getMessageAuthor().getIdAsString(), message));  // add incoming
+
             if(checkMessageLimit()){
-                // currentJar gets sent to ResponseBuilder
-                // currentJar sent to response builder message limit event
-                // this.responseBuilder.messageLimitEvent(currentJar);
+
             }
         }else{
             LOGGER.info("""
@@ -96,45 +99,29 @@ public class QueryHandler {
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
-
         if(validSyntax && isAdmin){
-
             // TODO: check if server has jar. If it does, set hasJar to true.
-
             if (!checkIfJarExists()){
-
                 if (messageLimit != 0){
-
                     // TODO: Store jar with message limit in database
-
-                    // SUGGESTED METHOD:
-                    // LocalDate creationDate = LocalDate.now();
-
                 } else {
-
                     // TODO: Store jar with time limit in database
-
-                    // SUGGESTED METHODS:
-                    // LocalDate creationDate = LocalDate.now();
-                    // LocalDate openingDate = creationDate.plusDays(timeLimitInDays);
-
                 }
-
             }else{
                 responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
         }else{
             responseBuilder.createJarResponse(validSyntax, isAdmin, false);
         }
-
     }
 
     public void viewMessages(boolean isAdmin) {
-
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
-            // this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+             responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+        }else{
+            responseBuilder.viewMessagesResponse(isAdmin, null);
         }
     }
 
@@ -165,11 +152,7 @@ public class QueryHandler {
             // TODO: update jarDeleted boolean
 
         }
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
-
     }
 
     public boolean checkMessageLimit(){
@@ -213,11 +196,9 @@ public class QueryHandler {
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
         }
-
     }
 
     public Boolean checkIfJarExists() {
-
         String checkJarExistsQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
@@ -227,7 +208,6 @@ public class QueryHandler {
 
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
         return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
-
     }
 
     private void deserializeJarFromResponseBody() {
@@ -244,7 +224,6 @@ public class QueryHandler {
 
     public Boolean checkIfMessageAdded(Message addMessage) {
         jsonHelper = new JSON_Handler();   // initialize JSON helper
-
         // Block quotes query, is a NoSql Query that adds a message to the message array
         String addMessageQuery = """
                 {"collection":"Jars",
@@ -256,7 +235,6 @@ public class QueryHandler {
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
         processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
         return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
-
     }
 
     public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
@@ -266,7 +244,6 @@ public class QueryHandler {
     }
 
     public void createJarQuery(Jar jar) {
-
         String createJarQuery = """
                 {
                     "collection":"Jars",
@@ -276,7 +253,6 @@ public class QueryHandler {
                     "document": %s
                 }
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(jar).stripIndent());
-
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
 
@@ -303,7 +279,4 @@ public class QueryHandler {
         this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.invalidCommandResponse();
     }
-
 }
-
-
