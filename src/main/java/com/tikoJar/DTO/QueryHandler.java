@@ -82,7 +82,7 @@ public class QueryHandler {
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             currentJar.addMessage(new Message(event.getMessageAuthor().getIdAsString(), message));  // add incoming
             if(checkMessageLimit()){
-                responseBuilder.messageLimitEvent(Jar jar);
+                responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
             LOGGER.info("""
