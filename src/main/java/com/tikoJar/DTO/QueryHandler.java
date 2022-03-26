@@ -63,16 +63,16 @@ public class QueryHandler {
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
                 () -> LOGGER.warn("Error retrieving Server ID from Javacord API"));
         LOGGER.trace("""
-                Initializing QueryHandler for
-                %s : %s
-                """.formatted(serverName, serverId));
+            Initializing QueryHandler for
+            %s : %s
+            """.formatted(serverName, serverId));
     }
 
     public void addMessage(String message) {
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
-                    Jar Exists for Server: %s : %s
-                    """.formatted(serverName, serverId));
+                Jar Exists for Server: %s : %s
+                """.formatted(serverName, serverId));
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getIdAsString(), message)))
             LOGGER.info("""
@@ -113,7 +113,7 @@ public class QueryHandler {
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
-             responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+            responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }else{  // If does not exists, passes null jar and result is outputted to user in RB
             responseBuilder.viewMessagesResponse(isAdmin, null);
         }
