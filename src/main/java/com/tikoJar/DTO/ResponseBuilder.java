@@ -180,8 +180,12 @@ public class ResponseBuilder {
 
                 event.getChannel().sendMessage("This jar is currently empty.");
 
+<<<<<<< HEAD
             }z
 
+=======
+            }
+>>>>>>> 46ae36b7784457308ee39f26aec255d0eb4a0925
         }
 
     }
