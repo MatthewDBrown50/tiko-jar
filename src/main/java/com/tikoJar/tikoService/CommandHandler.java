@@ -39,7 +39,6 @@ public class CommandHandler {
 
     public static final Logger LOGGER = LogManager.getLogger("CommandHandler.class");
 
-
     public static void main(String[] args) {
 
 
