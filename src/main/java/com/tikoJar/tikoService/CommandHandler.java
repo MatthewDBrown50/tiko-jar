@@ -45,7 +45,6 @@ public class CommandHandler {
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
 
         new TimedEventHandler();
-
         api.addMessageCreateListener(event -> new Thread(() -> {
 
             Server server = event.getServer().orElse(null);

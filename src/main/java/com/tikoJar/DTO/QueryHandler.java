@@ -19,6 +19,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -83,10 +85,12 @@ public class QueryHandler implements MNDPOINT {
                         deleteJarQuery(this.serverId);
                     }
                 }
-            } else {
+            }
+            else {
                 responseBuilder.addMessageResponse(false, true);
             }
-        } else {
+        }
+        else {
             responseBuilder.addMessageResponse(false, lengthExceedsLimit);
         }
     }
@@ -157,13 +161,13 @@ public class QueryHandler implements MNDPOINT {
            OkHttpClient client = new OkHttpClient().newBuilder().build();
            MediaType mediaType = MediaType.parse("application/json");
            RequestBody body = RequestBody.create(query, mediaType);
-           String url = "https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint);
+           String url = "https://data.mongodb-api.com/app/data-pevfh/endpoint/data/beta/action/%s".formatted(endPoint);
            Request request = new Request.Builder()
                    .url(url)
                    .method("POST", body)
                    .addHeader("Content-Type", "application/json")
                    .addHeader("Access-Control-Request-Headers", "*")
-                   .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
+                   .addHeader("api-key", "gazMbV6sc6HIphMDANimLtXrszM5xddB35LPO5dRy0HCBDqbGKeRKQZlQFFhHbcR")
                    .build();
            Response response = client.newCall(request).execute();  // execute the request
            LOGGER.debug("Process Query for Endpoint %s Called for %s %s - \nQuery: \n%s".formatted(endPoint, serverName, serverId, query));
@@ -303,7 +307,7 @@ public class QueryHandler implements MNDPOINT {
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
-    public String stripDocument(String preStrip, Boolean isArray){  // strips document encapsulation from projected HTTP NoSql Queries
+    public String stripDocument(String preStrip, @NotNull Boolean isArray){  // strips document encapsulation from projected HTTP NoSql Queries
         // this formats that string representative in a way of how it's inserted into the database thus deserialization
         // should be easier
         if (isArray){
@@ -313,6 +317,7 @@ public class QueryHandler implements MNDPOINT {
         }
 
     }
+
     public void createJarQuery(Jar jar) {
         String createJarQuery = """
                 {"collection":"Jars",
@@ -323,6 +328,7 @@ public class QueryHandler implements MNDPOINT {
         String postResponse = processQuery(createJarQuery,MNDPOINT.INSERT1);
         LOGGER.debug("-- Check if Jar Created Post Response --\n%s".formatted(postResponse));
     }
+
     public void getHelp(){
         LOGGER.info("""
                 getHelp() Function Called for: %s
